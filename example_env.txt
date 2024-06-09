@@ -1,0 +1,9 @@
+# NOTE: rename this file to .env after adding the variables below...
+
+SQL_HOST = "IP Address of your MySQL Server"
+SQL_USER = "username you will be connecting to the MySQL Server with"
+SQL_PASSWORD = "password associated with your username"
+SQL_NAME = "name database in the MySQL server you want to use as the default"
+
+GMAIL_ACCOUNT = "the gmail account that will be handling sending automated emails"
+SECRET_KEY = "YOUR VERY VERY SECRET KEY HERE"
