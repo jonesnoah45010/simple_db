@@ -6,16 +6,16 @@ via daily scheduled partition altering events in order to make read operations f
 
 # Initial Setup...
 1. Open the example_env.txt file
-2. Add your personal MySQL server credentials to example_env.txt
+2. Add your personal MySQL server credentials to example_env.txt, if you do not have a MySQL server running, see Setting up MySQL Server and VPC Connector in Google Cloud.  Remember that you will need to use the local MySQL IP when deploying to cloudrun and the public MySQL IP when running locally.
 3. Rename example_env.txt to .env
 4. Create python3.11 virtual environment
 5. pip install -r requirements.txt
 6. Open true_database.sql
 7. Replace "YOUR_DATABASE_NAME" in true_database.sql with the database name you defined under SQL_NAME in .env
-8. Create the simple_db and simple_db_users tables in your database by executing true_database.sql with your MySQL client
-9. You will need to setup a google cloud console project to use the automated emails for account creation feature. Follow instructions below...
+8. Create necessary tables in your database by executing true_database.sql within your MySQL client
+9. You will need to setup a google cloud console project to use the automated emails for account creation feature. See Setup Google Cloud Console Gmail API.
 
-
+# Setting up Google Cloud Console Gmail API:
 ### Step 1: Create a Project in Google Cloud Console
 
 1.  **Go to Google Cloud Console**: Visit the Google Cloud Console.
@@ -49,7 +49,6 @@ via daily scheduled partition altering events in order to make read operations f
     -   Click "Create".
     -   Download the `client_secret.json` file and save it as `send_email_creds.json` in the same directory as send_email.py
 
-10. You will also need to have a MySQL server with a vpc-connector that can access cloud run set up in the google cloud console.
 
 # Setting up MySQL Server and VPC Connector in Google Cloud
 
