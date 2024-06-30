@@ -1,7 +1,8 @@
 # Simple DB API
-This API behaves like a simple, easy to use, JSON based database service.  
-Users can save and later extract saved JSON data.  The MySQL database 
-table in use is partitioned by the user_id and kept up to date on new users
+This API behaves like a simple, easy to use, JSON based user management service.  
+Users can be created and have basic password reset options.
+JSON data associated with each user can be saved and later extracted.  
+The MySQL database table in use is partitioned by the user_id and kept up to date on new users
 via daily scheduled partition altering events.
 
 # Initial Setup...
@@ -62,6 +63,7 @@ curl -X 'POST' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{"username": "YOUR_USER_NAME","email": "YOUR_EMAIL@EMAIL.COM"}'
+
 ```
 
 # To validate account and create perminent password...
@@ -72,13 +74,14 @@ curl -X 'POST' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{"username":"YOUR_USER_NAME","temp_password":"YOUR_TEMP_PASSWORD","new_password":"YOUR_NEW_PASSWORD"}'
+
 ```
 
 # If you forget your username...
 You will recieve an email after POST with your username
 ```sh
-curl -X POST 
-  "http://localhost:8000/forgot_username" \
+curl -X 'POST' \
+  'http://127.0.0.1:8000/forgot_username' \
   -H "Content-Type: application/json" \
   -d '{"email": "YOUR_EMAIL@EMAIL.COM"}'
 
@@ -88,8 +91,8 @@ curl -X POST
 You will recieve an email after POST with your temporary password
 You will then need to go back through the /validate_and_create_password process
 ```sh
-curl -X POST 
-  "http://localhost:8000/forgot_password" \
+curl -X 'POST' \
+  'http://127.0.0.1:8000/forgot_password' \
   -H "Content-Type: application/json" \
   -d '{"email": "YOUR_EMAIL@EMAIL.COM"}'
 
@@ -99,97 +102,119 @@ curl -X POST
 You can generate as many as you want but they will always expire after 24 hours
 ```sh
 curl -X 'GET' \
-  'http://127.0.0.1:8000/get_session_token?username=<YOUR_USER_NAME>&password=<YOUR_PASSWORD_HERE>' \
+  'http://127.0.0.1:8000/get_session_token?username=<YOUR_USER_NAME>&password=<YOUR_PASSWORD>' \
   -H 'accept: application/json'
+
 ```
 
-# Insert data using...
+# To delete your account...
+```sh
+curl -X 'POST' \
+  'http://127.0.0.1:8000/delete_account' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer <YOUR_ACCESS_TOKEN>'
+
+```
+
+# To Insert data using CURL...
 ```sh
 curl -X 'POST' \
   'http://127.0.0.1:8000/insert_data' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer <your_access_token_here>' \
+  -H 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
   -H 'Content-Type: application/json' \
-  -d '{"search_key": "key77","data": "{\"key_name\":\"value_name\"}"}'
+  -d '{"search_key": "YOUR_SEARCHABLE_KEY","data": "{\"key_name\":\"value_name\"}"}'
+
 ```
 ... or ...
 ```sh
 curl -X 'POST' \
   'http://127.0.0.1:8000/insert_data' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer <your_access_token_here>' \
+  -H 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
   -H 'Content-Type: application/json' \
-  -d '{"search_key": "key2","data": "{\"key_name\":1}"}'
+  -d '{"search_key": "YOUR_SEARCHABLE_KEY","data": "{\"key_name\":42}"}'
+
 ```
 ... etc ...
 
 # To insert data using Python...
 ```python
-import requests
 import json
+import requests
+
+# Obtain the access token...
+# Note: access token is valid for 24 hours, so you don't need a new one for every transaction
+token_url = "http://127.0.0.1:8000/get_session_token"
+token_params = {
+    "username": "testuser",
+    "password": "testpassword"
+}
+
+token_response = requests.get(token_url, params=token_params)
+token_response_data = token_response.json()
+access_token = token_response_data["access_token"]
+
+# Use the access token to make an authenticated request
 url = "http://127.0.0.1:8000/insert_data"
-my_dict = {"key_name": 2} # can be any dict structure
-data = {"search_key": "search_key_name","data": json.dumps(my_dict)}
-response = requests.post(url, json=data)
+my_dict = {"derp": "flerp"}  # can be any dict structure
+data = {
+    "search_key": "your_search_key_name",
+    "data": json.dumps(my_dict)
+}
+headers = {
+    "Authorization": f"Bearer {access_token}",
+    "Content-Type": "application/json"
+}
+
+response = requests.post(url, json=data, headers=headers)
+
+print(response.status_code)
+print(response.json())
+
 ```
 
 
-# Select data using...
+# To select data using CURL...
 
-if you know the exact day the entry was inserted..
 ```sh
 curl -X 'POST' \
   'http://127.0.0.1:8000/select_data' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer <your_access_token_here>' \
+  -H 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
   -H 'Content-Type: application/json' \
-  -d '{"search_key": "key1","created_date":"2024-05-27"}'
-```
-... or if you just want to do a search of all entries...
-```sh
-curl -X 'POST' \
-  'http://127.0.0.1:8000/select_data' \
-  -H 'accept: application/json' \
-  -H 'Authorization: Bearer <your_access_token_here>' \
-  -H 'Content-Type: application/json' \
-  -d '{"search_key": "key2"}'
-```
-... or if you know that the entry was inserted after a certain day...
-```sh
-curl -X 'POST' \
-  'http://127.0.0.1:8000/select_data' \
-  -H 'accept: application/json' \
-  -H 'Authorization: Bearer <your_access_token_here>' \
-  -H 'Content-Type: application/json' \
-  -d '{"search_key": "key100","created_date_is_after":"2024-05-27"}'
-```
-... or if you know that the entry was inserted before a certain day ...
-```sh
-curl -X 'POST' \
-  'http://127.0.0.1:8000/select_data' \
-  -H 'accept: application/json' \
-  -H 'Authorization: Bearer <your_access_token_here>' \
-  -H 'Content-Type: application/json' \
-  -d '{"search_key": "key100","created_date_is_before":"2024-06-03"}'
-```
-... or if you know that the entry was inserted within a range of days...
-```sh
-curl -X 'POST' \
-  'http://127.0.0.1:8000/select_data' \
-  -H 'accept: application/json' \
-  -H 'Authorization: Bearer <your_access_token_here>' \
-  -H 'Content-Type: application/json' \
-  -d '{"search_key": "key100","created_date_is_after":"2024-05-27","created_date_is_before":"2024-06-03"}'
+  -d '{"search_key": "key77"}'
 ```
 
 # To select data using Python...
 ```python
 import requests
+
+# Obtain the access token (as shown above)
+token_url = "http://127.0.0.1:8000/get_session_token"
+token_params = {
+    "username": "testuser",
+    "password": "testpassword"
+}
+
+token_response = requests.get(token_url, params=token_params)
+token_response_data = token_response.json()
+access_token = token_response_data["access_token"]
+
+# Use the access token to make an authenticated request
 url = "http://127.0.0.1:8000/select_data"
-data = {"search_key": "key3","created_date": "2023-05-27"}  
-# created_date is optional but improves speed
-response = requests.post(url, json=data)
+data = {"search_key": "your_search_key_name"}
+headers = {
+    "Authorization": f"Bearer {access_token}",
+    "Content-Type": "application/json"
+}
+
+response = requests.post(url, json=data, headers=headers)
+
+print(response.status_code)
 selected_data = response.json()
+print(selected_data)
+
 ```
 
 

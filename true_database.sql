@@ -83,3 +83,22 @@ CREATE TABLE simple_db_users (
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE);
 
 
+
+
+CREATE TABLE simple_db_temp_passwords (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username_UNIQUE` (`username`));
+
+
+
+
+
+
+
+
+
+
+
