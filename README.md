@@ -101,7 +101,7 @@ uvicorn app:app --reload
 # To create an account...
 ```sh
 curl -X 'POST' \
-  'http://127.0.0.1:8000/create_account' \
+  'http://127.0.0.1:8080/create_account' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{"username": "YOUR_USER_NAME","email": "YOUR_EMAIL@EMAIL.COM"}'
@@ -112,7 +112,7 @@ curl -X 'POST' \
 You only have to do this once
 ```sh
 curl -X 'POST' \
-  'http://127.0.0.1:8000/validate_and_create_password' \
+  'http://127.0.0.1:8080/validate_and_create_password' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{"username":"YOUR_USER_NAME","temp_password":"YOUR_TEMP_PASSWORD","new_password":"YOUR_NEW_PASSWORD"}'
@@ -123,7 +123,7 @@ curl -X 'POST' \
 You will recieve an email after POST with your username
 ```sh
 curl -X 'POST' \
-  'http://127.0.0.1:8000/forgot_username' \
+  'http://127.0.0.1:8080/forgot_username' \
   -H "Content-Type: application/json" \
   -d '{"email": "YOUR_EMAIL@EMAIL.COM"}'
 
@@ -134,7 +134,7 @@ You will recieve an email after POST with your temporary password
 You will then need to go back through the /validate_and_create_password process
 ```sh
 curl -X 'POST' \
-  'http://127.0.0.1:8000/forgot_password' \
+  'http://127.0.0.1:8080/forgot_password' \
   -H "Content-Type: application/json" \
   -d '{"email": "YOUR_EMAIL@EMAIL.COM"}'
 
@@ -144,7 +144,7 @@ curl -X 'POST' \
 You can generate as many as you want but they will always expire after 24 hours
 ```sh
 curl -X 'GET' \
-  'http://127.0.0.1:8000/get_session_token?username=<YOUR_USER_NAME>&password=<YOUR_PASSWORD>' \
+  'http://127.0.0.1:8080/get_session_token?username=<YOUR_USER_NAME>&password=<YOUR_PASSWORD>' \
   -H 'accept: application/json'
 
 ```
@@ -152,7 +152,7 @@ curl -X 'GET' \
 # To delete your account...
 ```sh
 curl -X 'POST' \
-  'http://127.0.0.1:8000/delete_account' \
+  'http://127.0.0.1:8080/delete_account' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer <YOUR_ACCESS_TOKEN>'
 
@@ -161,7 +161,7 @@ curl -X 'POST' \
 # To Insert data using CURL...
 ```sh
 curl -X 'POST' \
-  'http://127.0.0.1:8000/insert_data' \
+  'http://127.0.0.1:8080/insert_data' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
   -H 'Content-Type: application/json' \
@@ -171,7 +171,7 @@ curl -X 'POST' \
 ... or ...
 ```sh
 curl -X 'POST' \
-  'http://127.0.0.1:8000/insert_data' \
+  'http://127.0.0.1:8080/insert_data' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
   -H 'Content-Type: application/json' \
@@ -187,7 +187,7 @@ import requests
 
 # Obtain the access token...
 # Note: access token is valid for 24 hours, so you don't need a new one for every transaction
-token_url = "http://127.0.0.1:8000/get_session_token"
+token_url = "http://127.0.0.1:8080/get_session_token"
 token_params = {
     "username": "testuser",
     "password": "testpassword"
@@ -198,7 +198,7 @@ token_response_data = token_response.json()
 access_token = token_response_data["access_token"]
 
 # Use the access token to make an authenticated request
-url = "http://127.0.0.1:8000/insert_data"
+url = "http://127.0.0.1:8080/insert_data"
 my_dict = {"derp": "flerp"}  # can be any dict structure
 data = {
     "search_key": "your_search_key_name",
@@ -221,7 +221,7 @@ print(response.json())
 
 ```sh
 curl -X 'POST' \
-  'http://127.0.0.1:8000/select_data' \
+  'http://127.0.0.1:8080/select_data' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
   -H 'Content-Type: application/json' \
@@ -233,7 +233,7 @@ curl -X 'POST' \
 import requests
 
 # Obtain the access token (as shown above)
-token_url = "http://127.0.0.1:8000/get_session_token"
+token_url = "http://127.0.0.1:8080/get_session_token"
 token_params = {
     "username": "testuser",
     "password": "testpassword"
@@ -244,7 +244,7 @@ token_response_data = token_response.json()
 access_token = token_response_data["access_token"]
 
 # Use the access token to make an authenticated request
-url = "http://127.0.0.1:8000/select_data"
+url = "http://127.0.0.1:8080/select_data"
 data = {"search_key": "your_search_key_name"}
 headers = {
     "Authorization": f"Bearer {access_token}",
@@ -258,6 +258,10 @@ selected_data = response.json()
 print(selected_data)
 
 ```
+
+
+
+
 
 
 
