@@ -1,9 +1,8 @@
 # Simple DB API
 This API behaves like a simple, easy to use, JSON based user management service.  
-Users can be created and have basic password reset options.
-JSON data associated with each user can be saved and later extracted.  
+Users can be created and have basic password reset options. JSON data associated with each user can be saved and later extracted.  
 The MySQL database table in use is partitioned by the user_id and kept up to date on new users
-via daily scheduled partition altering events.
+via daily scheduled partition altering events in order to make read operations faster.
 
 # Initial Setup...
 1. Open the example_env.txt file
