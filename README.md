@@ -50,11 +50,51 @@ via daily scheduled partition altering events.
     -   Click "Create".
     -   Download the `client_secret.json` file and save it as `send_email_creds.json` in the same directory as send_email.py
 
+10. You will also need to have a MySQL server with a vpc-connector that can access cloud run set up in the google cloud console.
 
-# Run Locally Using...
-```sh
-uvicorn app:app --reload
-```
+# Setting up MySQL Server and VPC Connector in Google Cloud
+
+## Prerequisites
+- Google Cloud account
+- Google Cloud project
+
+## Steps to Set Up MySQL Server
+
+### 1. Create a MySQL Instance
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. In the left sidebar, click on `SQL` under the `Databases` section.
+3. Click the `CREATE INSTANCE` button.
+4. Select `MySQL` as the database engine.
+5. Fill in the instance details:
+    - Instance ID: Choose a unique ID for your instance.
+    - Root password: Set a password for the root user.
+    - Region: Select the region where you want your instance to be hosted.
+    - Zone: You can leave it as `Any` or select a specific zone.
+6. Click `CREATE` to create the instance. This process might take a few minutes.
+
+### 2. Configure Network Settings
+1. After the instance is created, click on the instance name to open its details page.
+2. Go to the `Connections` tab.
+3. Under `Public IP`, click `Add network`.
+4. Add the IP ranges that are allowed to connect to your instance. For example, to allow all IPs, add `0.0.0.0/0`. However, for security reasons, it’s recommended to specify a more restrictive range.
+5. Click `Done` to save the network.
+
+## Steps to Set Up a VPC Connector
+
+### 1. Create a VPC Connector
+1. In the Google Cloud Console, go to the `VPC network` section.
+2. Click on `Serverless VPC access` in the left sidebar.
+3. Click `CREATE CONNECTOR`.
+4. Fill in the connector details:
+    - Name: Choose a name for your connector.
+    - Region: Select the same region where your MySQL instance is located.
+    - Network: Select the default VPC network.
+    - IP range: Provide an IP range (e.g., `10.8.0.0/28`). Make sure this range does not overlap with your existing VPC or subnet ranges.
+5. Click `CREATE` to create the connector. This process might take a few minutes.
+
+
+
+
 
 # To create an account...
 ```sh
