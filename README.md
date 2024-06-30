@@ -92,7 +92,10 @@ via daily scheduled partition altering events in order to make read operations f
 5. Click `CREATE` to create the connector. This process might take a few minutes.
 
 
-
+# Run app locally using...
+```sh
+uvicorn app:app --reload
+```
 
 
 # To create an account...
