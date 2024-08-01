@@ -1,0 +1,490 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Validate and Create Password</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h1 {
+            text-align: center;
+            color: #333333;
+        }
+        label {
+            font-weight: bold;
+            color: #555555;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #dddddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        #response {
+            margin-top: 15px;
+            text-align: center;
+            color: #006400;
+        }
+    </style>
+    <script>
+        async function submitForm(event) {
+            event.preventDefault();
+            const username = document.getElementById("username").value;
+            const tempPassword = document.getElementById("temp_password").value;
+            const newPassword = document.getElementById("new_password").value;
+
+            const response = await fetch("/validate_and_create_password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    temp_password: tempPassword,
+                    new_password: newPassword
+                })
+            });
+
+            const result = await response.json();
+            document.getElementById("response").innerText = result.message;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Validate Account</h1>
+        <form onsubmit="submitForm(event)">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" required><br>
+            <label for="temp_password">Temporary Password:</label><br>
+            <input type="password" id="temp_password" name="temp_password" required><br>
+            <label for="new_password">New Password:</label><br>
+            <input type="password" id="new_password" name="new_password" required><br><br>
+            <input type="submit" value="Submit">
+        </form>
+        <p id="response"></p>
+    </div>
+</body>
+</html> -->
+
+
+
+
+
+
+
+
+
+
+<!-- 
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Validate and Create Password</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h1 {
+            text-align: center;
+            color: #333333;
+        }
+        label {
+            font-weight: bold;
+            color: #555555;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #dddddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        #response {
+            margin-top: 15px;
+            text-align: center;
+            color: #006400;
+        }
+        #error {
+            margin-top: 15px;
+            text-align: center;
+            color: #ff0000;
+        }
+    </style>
+    <script>
+        async function submitForm(event) {
+            event.preventDefault();
+            const username = document.getElementById("username").value;
+            const tempPassword = document.getElementById("temp_password").value;
+            const newPassword = document.getElementById("new_password").value;
+            const newPasswordConfirm = document.getElementById("new_password_confirm").value;
+
+            if (newPassword !== newPasswordConfirm) {
+                document.getElementById("response").innerText = "New Password and Confirm Password do not match.";
+                return;
+            }
+
+            const response = await fetch("/validate_and_create_password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    temp_password: tempPassword,
+                    new_password: newPassword
+                })
+            });
+
+            const result = await response.json();
+            document.getElementById("response").innerText = result.message;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Validate Account</h1>
+        <form onsubmit="submitForm(event)">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" required><br>
+            <label for="temp_password">Temporary Password:</label><br>
+            <input type="password" id="temp_password" name="temp_password" required><br>
+            <label for="new_password">New Password:</label><br>
+            <input type="password" id="new_password" name="new_password" required><br>
+            <label for="new_password_confirm">Confirm New Password:</label><br>
+            <input type="password" id="new_password_confirm" name="new_password_confirm" required><br><br>
+            <input type="submit" value="Submit">
+        </form>
+        <p id="response"></p>
+    </div>
+</body>
+</html>
+
+ -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
+ <!DOCTYPE html>
+<html>
+<head>
+    <title>Validate and Create Password</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h1 {
+            text-align: center;
+            color: #333333;
+        }
+        label {
+            font-weight: bold;
+            color: #555555;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #dddddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        #response {
+            margin-top: 15px;
+            text-align: center;
+        }
+    </style>
+    <script>
+        async function submitForm(event) {
+            event.preventDefault();
+            const username = document.getElementById("username").value;
+            const tempPassword = document.getElementById("temp_password").value;
+            const newPassword = document.getElementById("new_password").value;
+            const newPasswordConfirm = document.getElementById("new_password_confirm").value;
+            const responseElement = document.getElementById("response");
+
+            if (newPassword !== newPasswordConfirm) {
+                responseElement.innerText = "New Password and Confirm Password do not match.";
+                responseElement.style.color = "#ff0000"; // Red color for error message
+                return;
+            }
+
+            const response = await fetch("/validate_and_create_password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    temp_password: tempPassword,
+                    new_password: newPassword
+                })
+            });
+
+            const result = await response.json();
+            responseElement.innerText = result.message;
+            responseElement.style.color = "#006400";
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Validate Account</h1>
+        <form onsubmit="submitForm(event)">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" required><br>
+            <label for="temp_password">Temporary Password:</label><br>
+            <input type="password" id="temp_password" name="temp_password" required><br>
+            <label for="new_password">New Password:</label><br>
+            <input type="password" id="new_password" name="new_password" required><br>
+            <label for="new_password_confirm">Confirm New Password:</label><br>
+            <input type="password" id="new_password_confirm" name="new_password_confirm" required><br><br>
+            <input type="submit" value="Submit">
+        </form>
+        <p id="response"></p>
+    </div>
+</body>
+</html> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Validate and Create Password</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h1 {
+            text-align: center;
+            color: #333333;
+        }
+        label {
+            font-weight: bold;
+            color: #555555;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #dddddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        #response {
+            margin-top: 15px;
+            text-align: center;
+        }
+    </style>
+    <script>
+        async function submitForm(event) {
+            event.preventDefault();
+            const username = document.getElementById("username").value;
+            const tempPassword = document.getElementById("temp_password").value;
+            const newPassword = document.getElementById("new_password").value;
+            const newPasswordConfirm = document.getElementById("new_password_confirm").value;
+            const responseElement = document.getElementById("response");
+
+            if (newPassword !== newPasswordConfirm) {
+                responseElement.innerText = "New Password and Confirm Password do not match.";
+                responseElement.style.color = "#ff0000"; // Red color for error message
+                return;
+            }
+
+            const response = await fetch("/validate_and_create_password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    temp_password: tempPassword,
+                    new_password: newPassword
+                })
+            });
+
+            const result = await response.json();
+            responseElement.innerText = result.message;
+            responseElement.style.color = "#006400";
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Validate Account</h1>
+        <form onsubmit="submitForm(event)">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" value="{{ username or '' }}" required><br>
+            <label for="temp_password">Temporary Password:</label><br>
+            <input type="password" id="temp_password" name="temp_password" required><br>
+            <label for="new_password">New Password:</label><br>
+            <input type="password" id="new_password" name="new_password" required><br>
+            <label for="new_password_confirm">Confirm New Password:</label><br>
+            <input type="password" id="new_password_confirm" name="new_password_confirm" required><br><br>
+            <input type="submit" value="Submit">
+        </form>
+        <p id="response"></p>
+    </div>
+</body>
+</html>
+

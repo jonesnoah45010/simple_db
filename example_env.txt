@@ -5,5 +5,7 @@ SQL_USER = "username you will be connecting to the MySQL Server with"
 SQL_PASSWORD = "password associated with your username"
 SQL_NAME = "name database in the MySQL server you want to use as the default"
 
+SERVICE_URL = "http://127.0.0.1:8000"
+
 GMAIL_ACCOUNT = "the gmail account that will be handling sending automated emails"
 SECRET_KEY = "YOUR VERY VERY SECRET KEY HERE"

@@ -170,9 +170,9 @@ curl -X 'POST' \
 ... or ...
 ```sh
 curl -X 'POST' \
-  'http://127.0.0.1:8080/insert_data' \
+  'http://127.0.0.1:8000/insert_data' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJub2FoIiwiZXhwIjoxNzIxODU1MjIwfQ.zy21QNkSMFSi3ptHw9V-hHNQHI-_GlH4V5PmxifI9IE' \
   -H 'Content-Type: application/json' \
   -d '{"search_key": "YOUR_SEARCHABLE_KEY","data": "{\"key_name\":42}"}'
 
@@ -257,10 +257,6 @@ selected_data = response.json()
 print(selected_data)
 
 ```
-
-
-
-
 
 
 

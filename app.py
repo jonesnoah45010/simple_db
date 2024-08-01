@@ -1,6 +1,6 @@
-from fastapi import FastAPI, HTTPException, Response, status, Depends
+from fastapi import FastAPI, HTTPException, Response, status, Depends, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
@@ -13,14 +13,29 @@ import os
 from jose import JWTError, jwt
 import traceback
 
-load_dotenv()
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 
+load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/get_session_token")
 app = FastAPI()
+
+app.add_middleware(
+	CORSMiddleware,
+	allow_origins=["*"],  # Allows all origins
+	allow_credentials=True,
+	allow_methods=["*"],  # Allows all methods
+	allow_headers=["*"],  # Allows all headers
+)
+
+
+templates = Jinja2Templates(directory="templates")
+
+
 
 class ForgotUsernameItem(BaseModel):
 	email: str
@@ -34,15 +49,15 @@ class CreateAccountItem(BaseModel):
 	username: str
 	email: str
 class InsertItem(BaseModel):
-	search_key: str
-	data: str
+	search_key: str = Field(..., example="your_search_key")
+	data: str = Field(..., example="{'key1':'value1','key2':'value2'}")
 class SelectItem(BaseModel):
-	search_key: str
+	search_key: str = Field(..., example="your_search_key")
 class DeleteEntryItem(BaseModel):
-	search_key: str
+	search_key: str = Field(..., example="your_search_key")
 class UpdateEntryItem(BaseModel):
-	search_key: str
-	new_entry: str
+	search_key: str = Field(..., example="your_search_key")
+	new_entry: str = Field(..., example="{'key1':'new_value1','key2':'new_value2'}")
 class Token(BaseModel):
 	access_token: str
 	token_type: str
@@ -140,13 +155,12 @@ def create_account(item: CreateAccountItem, response: Response):
 	SENDER = os.getenv("GMAIL_ACCOUNT")
 	RECIPIENT = d["email"]
 	SUBJECT = 'simple_db account created'
+	activation_page_link = str(os.getenv("SERVICE_URL")) + '/activate_user_form?username=' + str(d["username"])
 	MESSAGE_TEXT = (
 	'Thank you for creating a simple_db account under the username ' + d["username"] + 
 	'. Your temporary password is ' + temp_password + 
 	'\n You must set a new perminent password in order to activate your account. ' 
-	'You should send the HTTP POST request JSON \n'
-	'{"username":"' + d["username"] + '","temp_password":"' + temp_password + '","new_password":"YOUR_NEW_PASSWORD"}' 
-	'\nto the /validate_and_create_password endpoint of the simple_db API'
+	'Please activate your account using the link below...' + '\n' + activation_page_link
 	)
 	send_email(SENDER, RECIPIENT, SUBJECT, MESSAGE_TEXT)
 	to_insert = eval(repr(d))
@@ -159,12 +173,26 @@ def create_account(item: CreateAccountItem, response: Response):
 	return {"message":"successfully created account " + to_insert["username"] + ", check your email for temporary password"}
 
 
+
+
+@app.get("/activate_user_form", response_class=HTMLResponse)
+async def activate_user_form(request: Request, username: Optional[str] = None):
+    return templates.TemplateResponse("index.html", {"request": request, "username": username})
+
+
+
+
 @app.post("/validate_and_create_password")
 def validate_and_create_password(item: ValidateAccountItem, response: Response):
 	d = item.dict()
+	# print("validate_and_create_password " + str(d))
 	db = sql_db()
 	user_data = db.select("simple_db_users",("username = %s", (d["username"],)))
 	user_temp_password = db.select("simple_db_temp_passwords",("username = %s", (d["username"],)))
+
+	# print("validate_and_create_password user_data " + str(user_data))
+	# print("validate_and_create_password user_temp_password " + str(user_temp_password))
+
 	if len(user_data) > 0:
 		user_data = user_data[0]
 	else:
@@ -179,6 +207,7 @@ def validate_and_create_password(item: ValidateAccountItem, response: Response):
 			status_code=status.HTTP_404_NOT_FOUND,
 			detail="Username temporary password not found"
 		)
+	# print("validate_and_create_password check_password " + str(check_password(hashed_password = user_temp_password["password"], user_password = d["temp_password"])))
 	if not check_password(hashed_password = user_temp_password["password"], user_password = d["temp_password"]):
 		raise HTTPException(
 			status_code=status.HTTP_401_UNAUTHORIZED,
@@ -194,7 +223,6 @@ def validate_and_create_password(item: ValidateAccountItem, response: Response):
 	db.close()
 	response.status_code = status.HTTP_200_OK
 	return {"message":"your accound has been activated and your password reset"}
-
 
 @app.post("/forgot_username")
 def forgot_username(item: ForgotUsernameItem, response: Response):
@@ -216,7 +244,6 @@ def forgot_username(item: ForgotUsernameItem, response: Response):
 	db.close()
 	response.status_code = status.HTTP_200_OK
 	return {"message":"email with your username was sent to " + str(d["email"])}
-
 
 @app.post("/forgot_password")
 def forgot_password(item: ForgotPasswordItem, response: Response):
@@ -254,9 +281,9 @@ def forgot_password(item: ForgotPasswordItem, response: Response):
 	return {"message":"email with your new temporary password was sent to " + str(d["email"])}
 
 
-@app.get("/get_session_token", response_model=Token)
-async def get_session_token(username: str, password: str):
-	user = authenticate_user(username, password)
+@app.post("/get_session_token", response_model=Token)
+async def get_session_token(form_data: OAuth2PasswordRequestForm = Depends()):
+	user = authenticate_user(form_data.username, form_data.password)
 	if not user:
 		raise HTTPException(
 			status_code=status.HTTP_401_UNAUTHORIZED,
@@ -269,11 +296,9 @@ async def get_session_token(username: str, password: str):
 	)
 	return {"access_token": access_token, "token_type": "bearer"}
 
-
 @app.get("/users/me", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
 	return current_user
-
 
 @app.post("/delete_account")
 def delete_account(response: Response, current_user: User = Depends(get_current_active_user)):
@@ -288,12 +313,13 @@ def delete_account(response: Response, current_user: User = Depends(get_current_
 	response.status_code = status.HTTP_200_OK
 	return {"message":"successful deleted account " + str(username)}
 
-
 @app.post("/insert_data")
 def insert_data(item: InsertItem, response: Response, current_user: User = Depends(get_current_active_user)):
 	try:
 		db = sql_db()
 		d = item.dict()
+		print("INSERTING DATA " + str(d))
+		d["data"] = d["data"].replace("'",'"')
 		d["user_id"] = current_user["username"]
 		db.insert("simple_db",[d])
 		db.close()
@@ -305,7 +331,6 @@ def insert_data(item: InsertItem, response: Response, current_user: User = Depen
 			status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
 			detail=stack_trace
 		)
-
 
 @app.post("/select_data")
 def select_data(item: SelectItem, response: Response, current_user: User = Depends(get_current_active_user)):
@@ -332,7 +357,6 @@ def select_data(item: SelectItem, response: Response, current_user: User = Depen
 			detail=stack_trace
 		)
 
-
 @app.post("/delete_entry")
 def delete_entry(item: DeleteEntryItem, response: Response, current_user: User = Depends(get_current_active_user)):
 	db = sql_db()
@@ -348,7 +372,6 @@ def delete_entry(item: DeleteEntryItem, response: Response, current_user: User =
 		response.status_code = status.HTTP_200_OK
 		db.close()
 		return {"message":"no data was deleted for search_key " + str(d["search_key"])}
-
 
 @app.post("/update_entry")
 def update_entry(item: UpdateEntryItem, response: Response, current_user: User = Depends(get_current_active_user)):
@@ -376,6 +399,26 @@ def update_entry(item: UpdateEntryItem, response: Response, current_user: User =
 
 if __name__ == "__main__":
 	uvicorn.run("app:app", host="0.0.0.0", port=int(os.getenv('PORT', 8080)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
